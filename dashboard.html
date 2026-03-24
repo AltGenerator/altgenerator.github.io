@@ -7,7 +7,6 @@
     <style>
         :root {
             --discord-color: #5865F2;
-            --discord-hover: #4752C4;
             --red-accent: #ff4d4d;
             --bg-dark: #090A0F;
             --panel-bg: rgba(20, 22, 31, 0.95);
@@ -18,7 +17,7 @@
             padding: 0;
             background: var(--bg-dark);
             color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             overflow: hidden;
             height: 100vh;
         }
@@ -40,17 +39,15 @@
             height: 100%;
             background: rgba(9, 10, 15, 0.98);
             z-index: 9999;
-            display: none; /* Controlled by JS */
+            display: none;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
-            padding: 20px;
             backdrop-filter: blur(10px);
         }
 
         .error-box {
-            max-width: 500px;
             padding: 40px;
             border-radius: 20px;
             border: 1px solid rgba(255, 77, 77, 0.2);
@@ -59,7 +56,7 @@
 
         /* --- Dashboard UI --- */
         #dashboardUI {
-            display: none; /* Controlled by JS */
+            display: none;
             height: 100%;
         }
 
@@ -69,18 +66,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            position: relative;
-            z-index: 100;
-        }
-
-        .logo {
-            font-weight: 800;
-            font-size: 1.5rem;
-            letter-spacing: 1px;
-        }
-
-        .profile-container {
-            position: relative;
         }
 
         .pfp-btn {
@@ -89,69 +74,36 @@
             border-radius: 50%;
             border: 2px solid var(--red-accent);
             cursor: pointer;
-            transition: all 0.3s ease;
             background-size: cover;
             background-position: center;
             box-shadow: 0 0 15px rgba(255, 77, 77, 0.3);
         }
 
-        .pfp-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 20px var(--red-accent);
-        }
-
         .profile-panel {
             position: absolute;
-            top: 60px;
-            right: 0;
-            width: 220px;
+            top: 70px;
+            right: 40px;
+            width: 200px;
             background: var(--panel-bg);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            border-radius: 14px;
+            border-radius: 12px;
             padding: 15px;
             display: none;
             flex-direction: column;
-            gap: 12px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            gap: 10px;
             z-index: 1000;
         }
 
-        .profile-panel.active {
-            display: flex;
-            animation: slideDown 0.3s ease-out;
-        }
-
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .username-display {
-            font-weight: 600;
-            color: #fff;
-            text-align: center;
-        }
-
-        .divider {
-            height: 1px;
-            background: rgba(255, 255, 255, 0.1);
-        }
+        .profile-panel.active { display: flex; }
 
         .logout-btn {
             background: var(--red-accent);
             color: white;
             border: none;
-            padding: 10px;
-            border-radius: 8px;
+            padding: 8px;
+            border-radius: 6px;
             cursor: pointer;
             font-weight: 700;
-            transition: 0.2s;
-        }
-
-        .logout-btn:hover {
-            background: #e63939;
-            transform: translateY(-2px);
         }
 
         .main-content {
@@ -159,29 +111,10 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: calc(100vh - 100px);
-            text-align: center;
+            height: 70vh;
         }
 
-        h1 {
-            font-size: clamp(2rem, 6vw, 4rem);
-            margin: 0;
-        }
-
-        .welcome-name {
-            color: var(--red-accent);
-            text-shadow: 0 0 25px var(--red-accent);
-        }
-
-        a.link-blue {
-            color: var(--discord-color);
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        a.link-blue:hover {
-            text-decoration: underline;
-        }
+        .welcome-name { color: var(--red-accent); text-shadow: 0 0 20px var(--red-accent); }
     </style>
 </head>
 <body>
@@ -190,84 +123,76 @@
 
     <div id="errorOverlay">
         <div class="error-box">
-            <h2 style="color:var(--red-accent); margin-top:0;">Error when logging in!</h2>
-            <p>You're automatically being redirected back to the login page in <span id="countdown" style="font-weight:bold; color:var(--red-accent);">5</span> seconds.</p>
-            <p style="font-size: 0.9rem; opacity: 0.8;">
-                Click <a href="index.html" class="link-blue">here</a> if you're not redirected automatically.
-            </p>
+            <h2 style="color:var(--red-accent);">Error when logging in!</h2>
+            <p>Redirecting to login in <span id="countdown">5</span> seconds...</p>
+            <p><a href="index.html" style="color:var(--discord-color); font-weight:bold; text-decoration:none;">Click here</a> if not redirected.</p>
         </div>
     </div>
 
     <div id="dashboardUI">
         <nav>
-            <div class="logo">
-                <span style="color:var(--red-accent)">Alt</span>Generator+
-            </div>
-            
-            <div class="profile-container">
+            <div style="font-weight:800; font-size:1.5rem;"><span style="color:var(--red-accent)">Alt</span>Generator+</div>
+            <div style="position:relative;">
                 <div id="pfpBtn" class="pfp-btn"></div>
                 <div id="profilePanel" class="profile-panel">
-                    <div class="username-display" id="panelUsername">User#0000</div>
-                    <div class="divider"></div>
+                    <div id="panelUsername" style="text-align:center;">User#0000</div>
+                    <hr style="opacity:0.1; width:100%;">
                     <button class="logout-btn" onclick="logout()">Logout</button>
                 </div>
             </div>
         </nav>
-
-        <main class="main-content">
-            <h1>Welcome, <span class="welcome-name" id="displayUsername">User</span></h1>
-            <p style="opacity: 0.6; margin-top: 15px; font-size: 1.2rem;">What would you like to generate today?</p>
-        </main>
+        <div class="main-content">
+            <h1>Welcome, <span id="displayUsername" class="welcome-name">User</span></h1>
+            <p style="opacity:0.5;">Authentication Successful.</p>
+        </div>
     </div>
 
     <script>
-        // --- 1. LOGIN BRIDGE & AUTH CHECK ---
-        function checkAuth() {
+        // --- THE "BRIDGE" LOGIC ---
+        // This runs the moment the page loads
+        function initAuth() {
             const urlParams = new URLSearchParams(window.location.search);
-            
-            // Check if user is returning from Discord Authorization
-            if (urlParams.has('code') || window.location.hash.includes('access_token')) {
+            const hasDiscordCode = urlParams.has('code');
+
+            // 1. If we have a code in the URL, FORCE login state
+            if (hasDiscordCode) {
+                console.log("Discord code detected! Logging in...");
                 localStorage.setItem('isLoggedIn', 'true');
-                // Fake data for UI - in a real app, you'd fetch the real Discord profile here
                 localStorage.setItem('userData', JSON.stringify({
-                    username: "Discord User", 
+                    username: "Member", 
                     pfp: "https://cdn.discordapp.com/embed/avatars/0.png"
                 }));
-                // Clean the URL
+                // Clean the URL so the code doesn't stay there
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
 
+            // 2. Now check if we are logged in
             const isLoggedIn = localStorage.getItem('isLoggedIn');
             const userData = JSON.parse(localStorage.getItem('userData'));
 
-            if (!isLoggedIn || !userData) {
-                showErrorAndRedirect();
+            if (isLoggedIn === 'true' && userData) {
+                document.getElementById('dashboardUI').style.display = 'block';
+                document.getElementById('displayUsername').innerText = userData.username;
+                document.getElementById('panelUsername').innerText = userData.username;
+                document.getElementById('pfpBtn').style.backgroundImage = `url(${userData.pfp})`;
             } else {
-                showDashboard(userData);
+                startRedirect();
             }
         }
 
-        function showErrorAndRedirect() {
+        function startRedirect() {
             const overlay = document.getElementById('errorOverlay');
             const countdownEl = document.getElementById('countdown');
             overlay.style.display = 'flex';
-            
-            let seconds = 5;
+            let time = 5;
             const timer = setInterval(() => {
-                seconds--;
-                countdownEl.innerText = seconds;
-                if (seconds <= 0) {
+                time--;
+                countdownEl.innerText = time;
+                if (time <= 0) {
                     clearInterval(timer);
                     window.location.href = 'index.html';
                 }
             }, 1000);
-        }
-
-        function showDashboard(data) {
-            document.getElementById('dashboardUI').style.display = 'block';
-            document.getElementById('displayUsername').innerText = data.username;
-            document.getElementById('panelUsername').innerText = data.username;
-            document.getElementById('pfpBtn').style.backgroundImage = `url(${data.pfp})`;
         }
 
         function logout() {
@@ -275,57 +200,39 @@
             window.location.href = 'index.html';
         }
 
-        // --- 2. UI LOGIC ---
+        // PFP Toggle
         const pfpBtn = document.getElementById('pfpBtn');
         const profilePanel = document.getElementById('profilePanel');
-
-        pfpBtn.addEventListener('click', (e) => {
+        pfpBtn.onclick = (e) => {
             e.stopPropagation();
             profilePanel.classList.toggle('active');
-        });
+        };
+        window.onclick = () => profilePanel.classList.remove('active');
 
-        window.addEventListener('click', () => {
-            profilePanel.classList.remove('active');
-        });
-
-        // --- 3. STAR BACKGROUND ---
+        // Star Background
         const canvas = document.getElementById('starCanvas');
         const ctx = canvas.getContext('2d');
         let stars = [];
-
-        function initStars() {
+        function resize() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
             stars = [];
-            for (let i = 0; i < 150; i++) {
-                stars.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    size: Math.random() * 2,
-                    speed: Math.random() * 0.4 + 0.1
-                });
-            }
+            for(let i=0; i<100; i++) stars.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, s:Math.random()*2});
         }
-
-        function drawStars() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        function draw() {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
             ctx.fillStyle = "white";
-            stars.forEach(star => {
-                ctx.beginPath();
-                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
-                ctx.fill();
-                star.y -= star.speed;
-                if (star.y < 0) star.y = canvas.height;
+            stars.forEach(s => {
+                ctx.beginPath(); ctx.arc(s.x, s.y, s.s, 0, Math.PI*2); ctx.fill();
+                s.y -= 0.2; if(s.y < 0) s.y = canvas.height;
             });
-            requestAnimationFrame(drawStars);
+            requestAnimationFrame(draw);
         }
+        window.onresize = resize;
+        resize(); draw();
 
-        window.addEventListener('resize', initStars);
-        initStars();
-        drawStars();
-        
-        // Start the Auth Check
-        checkAuth();
+        // RUN AUTH
+        initAuth();
     </script>
 </body>
 </html>
