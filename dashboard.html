@@ -13,7 +13,7 @@
             --red-hover: #e63939;
             --text-gray: #949ba4;
             --border-color: rgba(255, 255, 255, 0.05);
-            --upgrade-orange: #ff9900;
+            --no-stock-orange: #ff9900;
         }
 
         body {
@@ -35,6 +35,7 @@
             flex-direction: column;
             padding: 20px 0;
             flex-shrink: 0;
+            transition: transform 0.3s ease;
         }
 
         .sidebar-logo {
@@ -84,9 +85,6 @@
             color: white;
         }
 
-        .nav-item i { margin-right: 12px; }
-
-        /* Sidebar Bottom Profile */
         .sidebar-footer {
             margin-top: auto;
             padding: 20px 15px;
@@ -111,32 +109,12 @@
             border: 2px solid var(--red-accent);
         }
 
-        .user-info {
-            flex-grow: 1;
-            overflow: hidden;
-        }
-
-        .user-name {
-            font-size: 0.9rem;
-            font-weight: 700;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .user-status {
-            font-size: 0.7rem;
-            color: #43b581;
-            font-weight: 800;
-        }
-
-        .footer-btns {
-            display: flex;
-            gap: 8px;
-        }
+        .user-info { flex-grow: 1; overflow: hidden; }
+        .user-name { font-size: 0.9rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .user-status { font-size: 0.7rem; color: #43b581; font-weight: 800; }
 
         .footer-btn {
-            flex: 1;
+            width: 100%;
             padding: 8px;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--border-color);
@@ -145,7 +123,6 @@
             font-size: 0.8rem;
             font-weight: 700;
             cursor: pointer;
-            text-align: center;
             transition: 0.2s;
         }
 
@@ -171,6 +148,7 @@
             align-items: center;
             text-align: center;
             border: 1px solid var(--border-color);
+            min-height: 300px;
         }
 
         /* --- Account Cards --- */
@@ -187,141 +165,127 @@
             transition: 0.2s;
         }
 
-        .acc-type-card:hover { border-color: rgba(255, 77, 77, 0.3); }
-
-        .acc-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 10px;
-        }
-
+        .acc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
         .acc-title { font-weight: 700; font-size: 1.1rem; }
         
         .badge {
-            font-size: 0.7rem;
-            padding: 4px 8px;
-            border-radius: 5px;
-            font-weight: 800;
-            background: rgba(67, 181, 129, 0.1);
-            color: #43b581;
+            font-size: 0.7rem; padding: 4px 8px; border-radius: 5px;
+            font-weight: 800; background: rgba(67, 181, 129, 0.1); color: #43b581;
         }
 
-        .btn-upgrade {
-            position: absolute;
-            top: 50%;
-            left: 50%;
+        .btn-no-stock {
+            position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            background: var(--upgrade-orange);
+            background: var(--no-stock-orange);
             color: black;
             padding: 8px 16px;
             border-radius: 8px;
             font-weight: 800;
-            box-shadow: 0 0 20px rgba(255, 153, 0, 0.4);
-            cursor: pointer;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            box-shadow: 0 0 15px rgba(255, 153, 0, 0.2);
+            pointer-events: none;
             border: none;
         }
 
-        .locked { filter: blur(2px) grayscale(0.5); pointer-events: none; }
+        .locked { filter: blur(0.5px) grayscale(0.8); pointer-events: none; opacity: 0.6; }
 
-        /* --- Placeholder Right Side --- */
-        .empty-icon {
-            font-size: 50px;
-            opacity: 0.1;
-            margin-bottom: 20px;
+        /* --- Responsive Design --- */
+        @media (max-width: 900px) {
+            body { flex-direction: column; overflow-y: auto; height: auto; }
+            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border-color); }
+            .main-container { flex-direction: column; padding: 20px; }
+            .content-left, .content-right { width: 100%; }
         }
 
-        /* Error Overlay */
-        #errorOverlay {
-            position: fixed; inset: 0; background: var(--bg-dark);
-            z-index: 9999; display: none; flex-direction: column;
-            justify-content: center; align-items: center;
-        }
+        .empty-icon { font-size: 50px; opacity: 0.1; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
-    <div id="errorOverlay">
-        <h2 style="color:var(--red-accent)">Access Denied</h2>
-        <p>Redirecting to login...</p>
-    </div>
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <span style="color:var(--red-accent)">Alt</span>Generator+
+        </div>
 
-    <div id="dashboardUI" style="display:contents">
-        <aside class="sidebar">
-            <div class="sidebar-logo">
-                <span style="color:var(--red-accent)">Alt</span>Generator+
-            </div>
+        <div class="sidebar-section">
+            <div class="section-label">Dashboard</div>
+            <a class="nav-item active">⚡ Generate</a>
+            <a class="nav-item">🔒 Accounts</a>
+            <a class="nav-item">🔍 Scrape</a>
+        </div>
 
-            <div class="sidebar-section">
-                <div class="section-label">Dashboard</div>
-                <a class="nav-item active">⚡ Generate</a>
-                <a class="nav-item">🔒 Accounts</a>
-                <a class="nav-item">🔍 Scrape</a>
-            </div>
+        <div class="sidebar-section">
+            <div class="section-label">Resources</div>
+            <a class="nav-item">👑 Upgrade</a>
+            <a class="nav-item">🎁 Rewards</a>
+        </div>
 
-            <div class="sidebar-section">
-                <div class="section-label">Resources</div>
-                <a class="nav-item">👑 Upgrade</a>
-                <a class="nav-item">🎁 Rewards</a>
-            </div>
-
-            <div class="sidebar-footer">
-                <div class="user-card">
-                    <div id="userPfp" class="user-pfp"></div>
-                    <div class="user-info">
-                        <div id="userName" class="user-name">Loading...</div>
-                        <div class="user-status">Free Access</div>
-                    </div>
-                </div>
-                <div class="footer-btns">
-                    <button class="footer-btn">Settings</button>
-                    <button class="footer-btn" onclick="logout()" style="color:var(--red-accent)">Sign Out</button>
+        <div class="sidebar-footer">
+            <div class="user-card">
+                <div id="userPfp" class="user-pfp"></div>
+                <div class="user-info">
+                    <div id="userName" class="user-name">Loading...</div>
+                    <div class="user-status">Free Access</div>
                 </div>
             </div>
-        </aside>
+            <button class="footer-btn" onclick="logout()" style="color:var(--red-accent)">Sign Out</button>
+        </div>
+    </aside>
 
-        <main class="main-container">
-            <div class="content-left">
-                <h1 class="section-title">Account Types</h1>
-                <p class="section-desc">Select an account to generate</p>
+    <main class="main-container">
+        <div class="content-left">
+            <h1 class="section-title">Account Types</h1>
+            <p class="section-desc">Select an account to generate</p>
 
-                <div class="acc-type-card">
-                    <div class="acc-header">
-                        <div class="acc-title">Standard Alt</div>
-                        <span class="badge">✓ Pre-checked</span>
-                    </div>
-                    <p style="font-size: 0.8rem; color: var(--text-gray); margin: 0;">Generate basic Roblox alt account</p>
-                    <button class="footer-btn" style="width: 100%; margin-top: 15px; background: var(--red-accent);">Generate</button>
+            <div class="acc-type-card">
+                <div class="acc-header">
+                    <div class="acc-title">Standard Alt</div>
+                    <span class="badge">✓ Pre-checked</span>
                 </div>
-
-                <div class="acc-type-card">
-                    <div class="locked">
-                        <div class="acc-header">
-                            <div class="acc-title">Alt (30+ day)</div>
-                        </div>
-                        <p style="font-size: 0.8rem; color: var(--text-gray); margin: 0;">Aged account for better bypass</p>
-                    </div>
-                    <button class="btn-upgrade">👑 Upgrade</button>
-                </div>
-
-                <div class="acc-type-card">
-                    <div class="locked">
-                        <div class="acc-header">
-                            <div class="acc-title">Age-Verified Alt</div>
-                        </div>
-                        <p style="font-size: 0.8rem; color: var(--text-gray); margin: 0;">Account with voice chat / 13+</p>
-                    </div>
-                    <button class="btn-upgrade">👑 Upgrade</button>
-                </div>
+                <p style="font-size: 0.8rem; color: var(--text-gray); margin: 0;">Generate basic Roblox alt account</p>
+                <button class="footer-btn" style="width: 100%; margin-top: 15px; background: var(--red-accent);">Generate</button>
             </div>
 
-            <div class="content-right">
-                <div class="empty-icon">👤</div>
-                <h2 style="margin:0">No Account Generated</h2>
-                <p style="color:var(--text-gray); max-width: 300px;">Select an account type and click generate to create a new account.</p>
+            <div class="acc-type-card">
+                <div class="locked">
+                    <div class="acc-header"><div class="acc-title">Alt (30+ day)</div></div>
+                    <p style="font-size: 0.8rem; color: var(--text-gray); margin: 0;">Aged account for better bypass</p>
+                </div>
+                <button class="btn-no-stock">⚠️ No Stock!</button>
             </div>
-        </main>
-    </div>
+
+            <div class="acc-type-card">
+                <div class="locked">
+                    <div class="acc-header"><div class="acc-title">Age-Verified Alt</div></div>
+                    <p style="font-size: 0.8rem; color: var(--text-gray); margin: 0;">Account with voice chat / 13+</p>
+                </div>
+                <button class="btn-no-stock">⚠️ No Stock!</button>
+            </div>
+
+            <div class="acc-type-card">
+                <div class="locked">
+                    <div class="acc-header"><div class="acc-title">Random Account</div></div>
+                    <p style="font-size: 0.8rem; color: var(--text-gray); margin: 0;">Randomly selected high-tier account</p>
+                </div>
+                <button class="btn-no-stock">⚠️ No Stock!</button>
+            </div>
+
+            <div class="acc-type-card">
+                <div class="locked">
+                    <div class="acc-header"><div class="acc-title">Random Account</div></div>
+                    <p style="font-size: 0.8rem; color: var(--text-gray); margin: 0;">Randomly selected high-tier account</p>
+                </div>
+                <button class="btn-no-stock">⚠️ No Stock!</button>
+            </div>
+        </div>
+
+        <div class="content-right">
+            <div class="empty-icon">👤</div>
+            <h2 style="margin:0">No Account Generated</h2>
+            <p style="color:var(--text-gray); max-width: 300px;">Select an account type and click generate to create a new account.</p>
+        </div>
+    </main>
 
     <script>
         function initAuth() {
@@ -329,7 +293,6 @@
             const userParam = urlParams.get('username');
             const pfpParam = urlParams.get('pfp');
 
-            // If we just came from Discord via Python, overwrite the old PFP and name
             if (userParam && pfpParam) {
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('userData', JSON.stringify({
@@ -346,8 +309,7 @@
                 document.getElementById('userName').innerText = userData.username;
                 document.getElementById('userPfp').style.backgroundImage = `url('${userData.pfp}')`;
             } else {
-                document.getElementById('errorOverlay').style.display = 'flex';
-                setTimeout(() => window.location.href = 'index.html', 3000);
+                window.location.href = 'index.html';
             }
         }
 
@@ -355,7 +317,6 @@
             localStorage.clear();
             window.location.href = 'index.html';
         }
-
         initAuth();
     </script>
 </body>
