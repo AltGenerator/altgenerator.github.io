@@ -7,9 +7,10 @@
     <style>
         :root {
             --discord-color: #5865F2;
+            --discord-hover: #4752C4;
             --red-accent: #ff4d4d;
             --bg-dark: #090A0F;
-            --panel-bg: rgba(255, 255, 255, 0.05);
+            --panel-bg: rgba(20, 22, 31, 0.95);
         }
 
         body {
@@ -17,7 +18,7 @@
             padding: 0;
             background: var(--bg-dark);
             color: white;
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             overflow: hidden;
             height: 100vh;
         }
@@ -30,7 +31,38 @@
             background: radial-gradient(circle at center, #1B2735 0%, #090A0F 100%);
         }
 
-        /* --- Navbar & Profile --- */
+        /* --- Error Overlay --- */
+        #errorOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(9, 10, 15, 0.98);
+            z-index: 9999;
+            display: none; /* Controlled by JS */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .error-box {
+            max-width: 500px;
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 77, 77, 0.2);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        /* --- Dashboard UI --- */
+        #dashboardUI {
+            display: none; /* Controlled by JS */
+            height: 100%;
+        }
+
         nav {
             width: 100%;
             padding: 20px 40px;
@@ -52,94 +84,103 @@
         }
 
         .pfp-btn {
-            width: 50px;
-            height: 50px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
             border: 2px solid var(--red-accent);
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: all 0.3s ease;
             background-size: cover;
             background-position: center;
-            box-shadow: 0 0 15px var(--red-accent);
+            box-shadow: 0 0 15px rgba(255, 77, 77, 0.3);
         }
 
         .pfp-btn:hover {
             transform: scale(1.1);
+            box-shadow: 0 0 20px var(--red-accent);
         }
 
-        /* --- Dropdown Panel --- */
         .profile-panel {
             position: absolute;
-            top: 65px;
+            top: 60px;
             right: 0;
-            width: 200px;
-            background: rgba(20, 22, 31, 0.95);
-            border: 1px solid rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
+            width: 220px;
+            background: var(--panel-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 14px;
             padding: 15px;
-            display: none; /* Hidden by default */
+            display: none;
             flex-direction: column;
-            gap: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            gap: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            z-index: 1000;
         }
 
         .profile-panel.active {
             display: flex;
-            animation: fadeIn 0.2s ease-out;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .username-display {
             font-weight: 600;
-            color: #ddd;
+            color: #fff;
             text-align: center;
-            font-size: 0.9rem;
         }
 
         .divider {
             height: 1px;
-            background: rgba(255,255,255,0.1);
-            margin: 5px 0;
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .logout-btn {
             background: var(--red-accent);
             color: white;
             border: none;
-            padding: 8px;
-            border-radius: 6px;
+            padding: 10px;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: 700;
             transition: 0.2s;
         }
 
         .logout-btn:hover {
-            background: #cc0000;
+            background: #e63939;
+            transform: translateY(-2px);
         }
 
-        /* --- Main Content --- */
         .main-content {
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 80vh;
+            height: calc(100vh - 100px);
             text-align: center;
         }
 
         h1 {
-            font-size: clamp(2rem, 5vw, 3.5rem);
-            margin-bottom: 10px;
+            font-size: clamp(2rem, 6vw, 4rem);
+            margin: 0;
         }
 
         .welcome-name {
             color: var(--red-accent);
-            text-shadow: 0 0 20px var(--red-accent);
+            text-shadow: 0 0 25px var(--red-accent);
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+        a.link-blue {
+            color: var(--discord-color);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        a.link-blue:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -147,41 +188,86 @@
 
     <canvas id="starCanvas"></canvas>
 
-    <nav>
-        <div class="logo">
-            <span style="color:var(--red-accent)">Alt</span>Generator+
+    <div id="errorOverlay">
+        <div class="error-box">
+            <h2 style="color:var(--red-accent); margin-top:0;">Error when logging in!</h2>
+            <p>You're automatically being redirected back to the login page in <span id="countdown" style="font-weight:bold; color:var(--red-accent);">5</span> seconds.</p>
+            <p style="font-size: 0.9rem; opacity: 0.8;">
+                Click <a href="index.html" class="link-blue">here</a> if you're not redirected automatically.
+            </p>
         </div>
-        
-        <div class="profile-container">
-            <div id="pfpBtn" class="pfp-btn" style="background-image: url('https://cdn.discordapp.com/embed/avatars/0.png');"></div>
-            
-            <div id="profilePanel" class="profile-panel">
-                <div class="username-display" id="panelUsername">Username#0000</div>
-                <div class="divider"></div>
-                <button class="logout-btn" onclick="logout()">Logout</button>
-            </div>
-        </div>
-    </nav>
+    </div>
 
-    <main class="main-content">
-        <h1>Welcome, <span class="welcome-name" id="displayUsername">Guest</span></h1>
-        <p style="opacity: 0.6;">Select a tool from the sidebar to get started.</p>
-    </main>
+    <div id="dashboardUI">
+        <nav>
+            <div class="logo">
+                <span style="color:var(--red-accent)">Alt</span>Generator+
+            </div>
+            
+            <div class="profile-container">
+                <div id="pfpBtn" class="pfp-btn"></div>
+                <div id="profilePanel" class="profile-panel">
+                    <div class="username-display" id="panelUsername">User#0000</div>
+                    <div class="divider"></div>
+                    <button class="logout-btn" onclick="logout()">Logout</button>
+                </div>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <h1>Welcome, <span class="welcome-name" id="displayUsername">User</span></h1>
+            <p style="opacity: 0.6; margin-top: 15px; font-size: 1.2rem;">What would you like to generate today?</p>
+        </main>
+    </div>
 
     <script>
-        // --- AUTH REDIRECT LOGIC ---
-        // In a real Discord setup, you'd save these in localStorage after login
-        const userLoggedIn = localStorage.getItem('isLoggedIn');
-        const discordUser = JSON.parse(localStorage.getItem('userData'));
+        // --- 1. LOGIN BRIDGE & AUTH CHECK ---
+        function checkAuth() {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            // Check if user is returning from Discord Authorization
+            if (urlParams.has('code') || window.location.hash.includes('access_token')) {
+                localStorage.setItem('isLoggedIn', 'true');
+                // Fake data for UI - in a real app, you'd fetch the real Discord profile here
+                localStorage.setItem('userData', JSON.stringify({
+                    username: "Discord User", 
+                    pfp: "https://cdn.discordapp.com/embed/avatars/0.png"
+                }));
+                // Clean the URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
 
-        if (!userLoggedIn) {
-            // Redirect to index if not logged in
-            window.location.href = 'index.html'; 
-        } else {
-            // Populate UI with real data
-            document.getElementById('displayUsername').innerText = discordUser.username;
-            document.getElementById('panelUsername').innerText = discordUser.username;
-            document.getElementById('pfpBtn').style.backgroundImage = `url(${discordUser.pfp})`;
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            const userData = JSON.parse(localStorage.getItem('userData'));
+
+            if (!isLoggedIn || !userData) {
+                showErrorAndRedirect();
+            } else {
+                showDashboard(userData);
+            }
+        }
+
+        function showErrorAndRedirect() {
+            const overlay = document.getElementById('errorOverlay');
+            const countdownEl = document.getElementById('countdown');
+            overlay.style.display = 'flex';
+            
+            let seconds = 5;
+            const timer = setInterval(() => {
+                seconds--;
+                countdownEl.innerText = seconds;
+                if (seconds <= 0) {
+                    clearInterval(timer);
+                    window.location.href = 'index.html';
+                }
+            }, 1000);
+        }
+
+        function showDashboard(data) {
+            document.getElementById('dashboardUI').style.display = 'block';
+            document.getElementById('displayUsername').innerText = data.username;
+            document.getElementById('panelUsername').innerText = data.username;
+            document.getElementById('pfpBtn').style.backgroundImage = `url(${data.pfp})`;
         }
 
         function logout() {
@@ -189,22 +275,20 @@
             window.location.href = 'index.html';
         }
 
-        // --- UI LOGIC ---
+        // --- 2. UI LOGIC ---
         const pfpBtn = document.getElementById('pfpBtn');
         const profilePanel = document.getElementById('profilePanel');
 
-        pfpBtn.addEventListener('click', () => {
+        pfpBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
             profilePanel.classList.toggle('active');
         });
 
-        // Close panel if clicking outside
-        window.addEventListener('click', (e) => {
-            if (!pfpBtn.contains(e.target) && !profilePanel.contains(e.target)) {
-                profilePanel.classList.remove('active');
-            }
+        window.addEventListener('click', () => {
+            profilePanel.classList.remove('active');
         });
 
-        // --- STAR BACKGROUND (Same as index) ---
+        // --- 3. STAR BACKGROUND ---
         const canvas = document.getElementById('starCanvas');
         const ctx = canvas.getContext('2d');
         let stars = [];
@@ -218,7 +302,7 @@
                     x: Math.random() * canvas.width,
                     y: Math.random() * canvas.height,
                     size: Math.random() * 2,
-                    speed: Math.random() * 0.5 + 0.1
+                    speed: Math.random() * 0.4 + 0.1
                 });
             }
         }
@@ -239,6 +323,9 @@
         window.addEventListener('resize', initStars);
         initStars();
         drawStars();
+        
+        // Start the Auth Check
+        checkAuth();
     </script>
 </body>
 </html>
