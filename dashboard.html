@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Debug | AltGenerator+</title>
+    <title>Dashboard | AltGenerator+</title>
     <style>
         :root {
             --discord-color: #5865F2;
@@ -13,8 +13,7 @@
         }
 
         body {
-            margin: 0;
-            padding: 0;
+            margin: 0; padding: 0;
             background: var(--bg-dark);
             color: white;
             font-family: 'Segoe UI', sans-serif;
@@ -23,100 +22,66 @@
         }
 
         #starCanvas {
-            position: fixed;
-            top: 0;
-            left: 0;
+            position: fixed; top: 0; left: 0;
             z-index: -1;
             background: radial-gradient(circle at center, #1B2735 0%, #090A0F 100%);
         }
 
-        /* --- Debug/Error Overlay --- */
+        /* Error Overlay */
         #errorOverlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
             background: rgba(9, 10, 15, 0.98);
             z-index: 9999;
             display: none;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            text-align: center;
             backdrop-filter: blur(10px);
         }
 
         .error-box {
-            padding: 40px;
-            border-radius: 20px;
+            padding: 40px; border-radius: 20px;
             border: 1px solid rgba(255, 77, 77, 0.2);
             background: rgba(255, 255, 255, 0.03);
-            max-width: 450px;
+            text-align: center;
         }
 
-        /* --- Dashboard UI --- */
-        #dashboardUI {
-            display: none;
-            height: 100%;
-        }
+        /* Dashboard UI */
+        #dashboardUI { display: none; height: 100%; }
 
         nav {
-            width: 100%;
-            padding: 20px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            width: 100%; padding: 20px 40px;
+            display: flex; justify-content: space-between; align-items: center;
         }
 
         .pfp-btn {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            border: 2px solid var(--red-accent);
-            cursor: pointer;
-            background-size: cover;
-            background-position: center;
+            width: 48px; height: 48px;
+            border-radius: 50%; border: 2px solid var(--red-accent);
+            cursor: pointer; background-size: cover; background-position: center;
             box-shadow: 0 0 15px rgba(255, 77, 77, 0.3);
         }
 
         .profile-panel {
-            position: absolute;
-            top: 70px;
-            right: 40px;
-            width: 200px;
-            background: var(--panel-bg);
+            position: absolute; top: 70px; right: 40px;
+            width: 200px; background: var(--panel-bg);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 15px;
-            display: none;
-            flex-direction: column;
-            gap: 10px;
-            z-index: 1000;
+            border-radius: 12px; padding: 15px;
+            display: none; flex-direction: column; gap: 10px; z-index: 1000;
         }
 
         .profile-panel.active { display: flex; }
 
         .btn {
-            padding: 10px 20px;
-            border-radius: 8px;
-            border: none;
-            font-weight: 700;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            margin: 5px;
+            padding: 10px 20px; border-radius: 8px; border: none;
+            font-weight: 700; cursor: pointer; text-decoration: none;
         }
-
         .btn-red { background: var(--red-accent); color: white; }
         .btn-blue { background: var(--discord-color); color: white; }
 
         .main-content {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 70vh;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center; height: 70vh;
         }
 
         .welcome-name { color: var(--red-accent); text-shadow: 0 0 20px var(--red-accent); }
@@ -128,13 +93,9 @@
 
     <div id="errorOverlay">
         <div class="error-box">
-            <h2 style="color:var(--red-accent);">Debug: Not Logged In</h2>
-            <p id="debugStatus">Checking URL parameters...</p>
-            <p style="font-size: 0.9rem; opacity: 0.7;">I have disabled the auto-redirect so you can check the F12 console.</p>
-            <div style="margin-top: 20px;">
-                <a href="index.html" class="btn btn-blue">Go Back Home</a>
-                <button class="btn btn-red" onclick="document.getElementById('errorOverlay').style.display='none'">Dismiss & Peek at UI</button>
-            </div>
+            <h2 style="color:var(--red-accent);">Error when logging in!</h2>
+            <p>You're being redirected in <span id="countdown">5</span> seconds...</p>
+            <a href="index.html" class="btn btn-blue">Click here to go back</a>
         </div>
     </div>
 
@@ -144,94 +105,95 @@
             <div style="position:relative;">
                 <div id="pfpBtn" class="pfp-btn"></div>
                 <div id="profilePanel" class="profile-panel">
-                    <div id="panelUsername" style="text-align:center;">User#0000</div>
+                    <div id="panelUsername" style="text-align:center; font-weight:bold;">User#0000</div>
                     <hr style="opacity:0.1; width:100%;">
-                    <button class="btn btn-red" style="width:100%" onclick="logout()">Logout</button>
+                    <button class="btn btn-red" onclick="logout()">Logout</button>
                 </div>
             </div>
         </nav>
         <div class="main-content">
             <h1>Welcome, <span id="displayUsername" class="welcome-name">User</span></h1>
-            <p style="opacity:0.5;">If you see your name, the login worked!</p>
+            <p style="opacity:0.5;">Authentication Successful.</p>
         </div>
     </div>
 
     <script>
         function initAuth() {
-            console.log("--- Starting Auth Debug ---");
             const urlParams = new URLSearchParams(window.location.search);
-            const debugStatus = document.getElementById('debugStatus');
-            
-            const code = urlParams.get('code');
-            console.log("URL Code found:", code);
+            const userParam = urlParams.get('username');
+            const pfpParam = urlParams.get('pfp');
 
-            if (code) {
-                console.log("SUCCESS: Found Discord code. Setting local storage...");
+            // 1. If parameters exist in URL, we just arrived from Python!
+            if (userParam && pfpParam) {
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('userData', JSON.stringify({
-                    username: "Discord Member", 
-                    pfp: "https://cdn.discordapp.com/embed/avatars/2.png"
+                    username: userParam, 
+                    pfp: pfpParam
                 }));
-                // Remove the code from the URL for cleanliness
+                // Clean URL
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
 
+            // 2. Final check: is the session saved?
             const isLoggedIn = localStorage.getItem('isLoggedIn');
-            console.log("Local Storage 'isLoggedIn':", isLoggedIn);
+            const userData = JSON.parse(localStorage.getItem('userData'));
 
-            if (isLoggedIn === 'true') {
-                const userData = JSON.parse(localStorage.getItem('userData'));
-                console.log("User Data loaded:", userData);
-                
+            if (isLoggedIn === 'true' && userData) {
                 document.getElementById('dashboardUI').style.display = 'block';
-                document.getElementById('errorOverlay').style.display = 'none';
-                
                 document.getElementById('displayUsername').innerText = userData.username;
                 document.getElementById('panelUsername').innerText = userData.username;
-                document.getElementById('pfpBtn').style.backgroundImage = `url(${userData.pfp})`;
+                document.getElementById('pfpBtn').style.backgroundImage = `url('${userData.pfp}')`;
             } else {
-                console.log("FAILURE: No login state found.");
-                document.getElementById('errorOverlay').style.display = 'flex';
-                debugStatus.innerText = "No 'code' found in URL and no session in LocalStorage.";
+                showError();
             }
+        }
+
+        function showError() {
+            const overlay = document.getElementById('errorOverlay');
+            overlay.style.display = 'flex';
+            let time = 5;
+            const timer = setInterval(() => {
+                time--;
+                document.getElementById('countdown').innerText = time;
+                if(time <= 0) {
+                    clearInterval(timer);
+                    window.location.href = 'index.html';
+                }
+            }, 1000);
         }
 
         function logout() {
             localStorage.clear();
-            location.reload();
+            window.location.href = 'index.html';
         }
 
-        // PFP Toggle
-        const pfpBtn = document.getElementById('pfpBtn');
-        const profilePanel = document.getElementById('profilePanel');
-        pfpBtn.onclick = (e) => {
-            e.stopPropagation();
-            profilePanel.classList.toggle('active');
-        };
-
-        // Star Background
+        // Star background logic
         const canvas = document.getElementById('starCanvas');
         const ctx = canvas.getContext('2d');
         let stars = [];
         function resize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
             stars = [];
-            for(let i=0; i<80; i++) stars.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, s:Math.random()*2});
+            for(let i=0; i<100; i++) stars.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, s:Math.random()*2});
         }
         function draw() {
-            ctx.clearRect(0,0,canvas.width,canvas.height);
-            ctx.fillStyle = "white";
+            ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle = "white";
             stars.forEach(s => {
                 ctx.beginPath(); ctx.arc(s.x, s.y, s.s, 0, Math.PI*2); ctx.fill();
-                s.y -= 0.15; if(s.y < 0) s.y = canvas.height;
+                s.y -= 0.2; if(s.y < 0) s.y = canvas.height;
             });
             requestAnimationFrame(draw);
         }
+
+        // PFP toggle
+        document.getElementById('pfpBtn').onclick = (e) => {
+            e.stopPropagation();
+            document.getElementById('profilePanel').classList.toggle('active');
+        };
+        window.onclick = () => document.getElementById('profilePanel').classList.remove('active');
+
         window.onresize = resize;
         resize(); draw();
-
-        // EXECUTE
         initAuth();
     </script>
 </body>
