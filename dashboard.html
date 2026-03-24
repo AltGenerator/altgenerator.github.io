@@ -13,7 +13,8 @@
         }
 
         body {
-            margin: 0; padding: 0;
+            margin: 0;
+            padding: 0;
             background: var(--bg-dark);
             color: white;
             font-family: 'Segoe UI', sans-serif;
@@ -22,9 +23,129 @@
         }
 
         #starCanvas {
-            position: fixed; top: 0; left: 0;
+            position: fixed;
+            top: 0;
+            left: 0;
             z-index: -1;
             background: radial-gradient(circle at center, #1B2735 0%, #090A0F 100%);
+        }
+
+        /* --- Navbar --- */
+        nav {
+            width: 100%;
+            height: 80px;
+            padding: 0 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box; /* Prevents padding from pushing items off screen */
+            position: relative;
+            z-index: 100;
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+        }
+
+        /* --- Profile Section --- */
+        .profile-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .pfp-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 2px solid var(--red-accent);
+            cursor: pointer;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            box-shadow: 0 0 15px rgba(255, 77, 77, 0.4);
+            transition: transform 0.2s ease;
+        }
+
+        .pfp-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px var(--red-accent);
+        }
+
+        .profile-panel {
+            position: absolute;
+            top: 55px; /* Spaced below the PFP */
+            right: 0;  /* Aligns to the right edge of the PFP */
+            width: 220px;
+            background: var(--panel-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 12px;
+            padding: 15px;
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .profile-panel.active {
+            display: flex;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .username-display {
+            font-weight: 700;
+            color: #fff;
+            text-align: center;
+            font-size: 1rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .logout-btn {
+            background: var(--red-accent);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: #e63939;
+        }
+
+        /* --- Content --- */
+        #dashboardUI { display: none; }
+        
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: calc(100vh - 80px);
+            text-align: center;
+        }
+
+        .welcome-name {
+            color: var(--red-accent);
+            text-shadow: 0 0 20px var(--red-accent);
         }
 
         /* Error Overlay */
@@ -39,52 +160,6 @@
             align-items: center;
             backdrop-filter: blur(10px);
         }
-
-        .error-box {
-            padding: 40px; border-radius: 20px;
-            border: 1px solid rgba(255, 77, 77, 0.2);
-            background: rgba(255, 255, 255, 0.03);
-            text-align: center;
-        }
-
-        /* Dashboard UI */
-        #dashboardUI { display: none; height: 100%; }
-
-        nav {
-            width: 100%; padding: 20px 40px;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-
-        .pfp-btn {
-            width: 48px; height: 48px;
-            border-radius: 50%; border: 2px solid var(--red-accent);
-            cursor: pointer; background-size: cover; background-position: center;
-            box-shadow: 0 0 15px rgba(255, 77, 77, 0.3);
-        }
-
-        .profile-panel {
-            position: absolute; top: 70px; right: 40px;
-            width: 200px; background: var(--panel-bg);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px; padding: 15px;
-            display: none; flex-direction: column; gap: 10px; z-index: 1000;
-        }
-
-        .profile-panel.active { display: flex; }
-
-        .btn {
-            padding: 10px 20px; border-radius: 8px; border: none;
-            font-weight: 700; cursor: pointer; text-decoration: none;
-        }
-        .btn-red { background: var(--red-accent); color: white; }
-        .btn-blue { background: var(--discord-color); color: white; }
-
-        .main-content {
-            display: flex; flex-direction: column;
-            justify-content: center; align-items: center; height: 70vh;
-        }
-
-        .welcome-name { color: var(--red-accent); text-shadow: 0 0 20px var(--red-accent); }
     </style>
 </head>
 <body>
@@ -92,29 +167,31 @@
     <canvas id="starCanvas"></canvas>
 
     <div id="errorOverlay">
-        <div class="error-box">
-            <h2 style="color:var(--red-accent);">Error when logging in!</h2>
-            <p>You're being redirected in <span id="countdown">5</span> seconds...</p>
-            <a href="index.html" class="btn btn-blue">Click here to go back</a>
-        </div>
+        <h2 style="color:var(--red-accent);">Unauthorized Access</h2>
+        <p>Redirecting to login in <span id="countdown">5</span>s...</p>
     </div>
 
     <div id="dashboardUI">
         <nav>
-            <div style="font-weight:800; font-size:1.5rem;"><span style="color:var(--red-accent)">Alt</span>Generator+</div>
-            <div style="position:relative;">
+            <div class="logo">
+                <span style="color:var(--red-accent)">Alt</span>Generator+
+            </div>
+            
+            <div class="profile-wrapper">
                 <div id="pfpBtn" class="pfp-btn"></div>
+                
                 <div id="profilePanel" class="profile-panel">
-                    <div id="panelUsername" style="text-align:center; font-weight:bold;">User#0000</div>
-                    <hr style="opacity:0.1; width:100%;">
-                    <button class="btn btn-red" onclick="logout()">Logout</button>
+                    <div class="username-display" id="panelUsername">Loading...</div>
+                    <div class="divider"></div>
+                    <button class="logout-btn" onclick="logout()">Logout</button>
                 </div>
             </div>
         </nav>
-        <div class="main-content">
-            <h1>Welcome, <span id="displayUsername" class="welcome-name">User</span></h1>
-            <p style="opacity:0.5;">Authentication Successful.</p>
-        </div>
+
+        <main class="main-content">
+            <h1>Welcome, <span class="welcome-name" id="displayUsername">User</span></h1>
+            <p style="opacity: 0.6;">Your premium dashboard is ready.</p>
+        </main>
     </div>
 
     <script>
@@ -123,18 +200,17 @@
             const userParam = urlParams.get('username');
             const pfpParam = urlParams.get('pfp');
 
-            // 1. If parameters exist in URL, we just arrived from Python!
+            // 1. Capture data from Backend redirect
             if (userParam && pfpParam) {
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('userData', JSON.stringify({
                     username: userParam, 
-                    pfp: pfpParam
+                    pfp: decodeURIComponent(pfpParam)
                 }));
-                // Clean URL
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
 
-            // 2. Final check: is the session saved?
+            // 2. Check session
             const isLoggedIn = localStorage.getItem('isLoggedIn');
             const userData = JSON.parse(localStorage.getItem('userData'));
 
@@ -142,13 +218,16 @@
                 document.getElementById('dashboardUI').style.display = 'block';
                 document.getElementById('displayUsername').innerText = userData.username;
                 document.getElementById('panelUsername').innerText = userData.username;
-                document.getElementById('pfpBtn').style.backgroundImage = `url('${userData.pfp}')`;
+                
+                // Applying the real PFP
+                const pfpElement = document.getElementById('pfpBtn');
+                pfpElement.style.backgroundImage = `url('${userData.pfp}')`;
             } else {
-                showError();
+                handleRedirection();
             }
         }
 
-        function showError() {
+        function handleRedirection() {
             const overlay = document.getElementById('errorOverlay');
             overlay.style.display = 'flex';
             let time = 5;
@@ -167,14 +246,25 @@
             window.location.href = 'index.html';
         }
 
-        // Star background logic
+        // UI Interactions
+        const pfpBtn = document.getElementById('pfpBtn');
+        const profilePanel = document.getElementById('profilePanel');
+
+        pfpBtn.onclick = (e) => {
+            e.stopPropagation();
+            profilePanel.classList.toggle('active');
+        };
+
+        window.onclick = () => profilePanel.classList.remove('active');
+
+        // Star Background
         const canvas = document.getElementById('starCanvas');
         const ctx = canvas.getContext('2d');
         let stars = [];
         function resize() {
             canvas.width = window.innerWidth; canvas.height = window.innerHeight;
             stars = [];
-            for(let i=0; i<100; i++) stars.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, s:Math.random()*2});
+            for(let i=0; i<120; i++) stars.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, s:Math.random()*2});
         }
         function draw() {
             ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle = "white";
@@ -184,14 +274,6 @@
             });
             requestAnimationFrame(draw);
         }
-
-        // PFP toggle
-        document.getElementById('pfpBtn').onclick = (e) => {
-            e.stopPropagation();
-            document.getElementById('profilePanel').classList.toggle('active');
-        };
-        window.onclick = () => document.getElementById('profilePanel').classList.remove('active');
-
         window.onresize = resize;
         resize(); draw();
         initAuth();
