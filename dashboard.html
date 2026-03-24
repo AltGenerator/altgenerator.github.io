@@ -6,191 +6,320 @@
     <title>Dashboard | AltGenerator+</title>
     <style>
         :root {
-            --discord-color: #5865F2;
+            --bg-dark: #0d0e12;
+            --sidebar-bg: #090a0c;
+            --card-bg: #14161b;
             --red-accent: #ff4d4d;
-            --bg-dark: #090A0F;
-            --panel-bg: rgba(20, 22, 31, 0.95);
+            --red-hover: #e63939;
+            --text-gray: #949ba4;
+            --border-color: rgba(255, 255, 255, 0.05);
+            --upgrade-orange: #ff9900;
         }
 
         body {
             margin: 0;
-            padding: 0;
             background: var(--bg-dark);
             color: white;
             font-family: 'Segoe UI', sans-serif;
-            overflow: hidden;
+            display: flex;
             height: 100vh;
-        }
-
-        #starCanvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: -1;
-            background: radial-gradient(circle at center, #1B2735 0%, #090A0F 100%);
-        }
-
-        /* --- Navbar --- */
-        nav {
-            width: 100%;
-            height: 80px;
-            padding: 0 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-sizing: border-box; /* Prevents padding from pushing items off screen */
-            position: relative;
-            z-index: 100;
-        }
-
-        .logo {
-            font-weight: 800;
-            font-size: 1.5rem;
-            letter-spacing: 1px;
-        }
-
-        /* --- Profile Section --- */
-        .profile-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .pfp-btn {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            border: 2px solid var(--red-accent);
-            cursor: pointer;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            box-shadow: 0 0 15px rgba(255, 77, 77, 0.4);
-            transition: transform 0.2s ease;
-        }
-
-        .pfp-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px var(--red-accent);
-        }
-
-        .profile-panel {
-            position: absolute;
-            top: 55px; /* Spaced below the PFP */
-            right: 0;  /* Aligns to the right edge of the PFP */
-            width: 220px;
-            background: var(--panel-bg);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            border-radius: 12px;
-            padding: 15px;
-            display: none;
-            flex-direction: column;
-            gap: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            z-index: 1000;
-        }
-
-        .profile-panel.active {
-            display: flex;
-            animation: fadeIn 0.2s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .username-display {
-            font-weight: 700;
-            color: #fff;
-            text-align: center;
-            font-size: 1rem;
             overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
         }
 
-        .divider {
-            height: 1px;
-            background: rgba(255, 255, 255, 0.1);
+        /* --- Sidebar --- */
+        .sidebar {
+            width: 260px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 20px 0;
+            flex-shrink: 0;
         }
 
-        .logout-btn {
+        .sidebar-logo {
+            padding: 0 25px 30px;
+            font-size: 1.4rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-section {
+            padding: 0 15px;
+            margin-bottom: 25px;
+        }
+
+        .section-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            padding-left: 10px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: 10px;
+            color: var(--text-gray);
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 5px;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+
+        .nav-item.active {
             background: var(--red-accent);
             color: white;
-            border: none;
+        }
+
+        .nav-item i { margin-right: 12px; }
+
+        /* Sidebar Bottom Profile */
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 20px 15px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .user-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
             padding: 10px;
-            border-radius: 8px;
-            cursor: pointer;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.02);
+            margin-bottom: 10px;
+        }
+
+        .user-pfp {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background-size: cover;
+            border: 2px solid var(--red-accent);
+        }
+
+        .user-info {
+            flex-grow: 1;
+            overflow: hidden;
+        }
+
+        .user-name {
+            font-size: 0.9rem;
             font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-status {
+            font-size: 0.7rem;
+            color: #43b581;
+            font-weight: 800;
+        }
+
+        .footer-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .footer-btn {
+            flex: 1;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
             transition: 0.2s;
         }
 
-        .logout-btn:hover {
-            background: #e63939;
+        .footer-btn:hover { background: var(--red-accent); }
+
+        /* --- Main Content --- */
+        .main-container {
+            flex-grow: 1;
+            display: flex;
+            padding: 30px;
+            gap: 30px;
+            overflow-y: auto;
         }
 
-        /* --- Content --- */
-        #dashboardUI { display: none; }
-        
-        .main-content {
+        .content-left { width: 45%; }
+        .content-right {
+            width: 55%;
+            background: var(--card-bg);
+            border-radius: 20px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: calc(100vh - 80px);
             text-align: center;
+            border: 1px solid var(--border-color);
         }
 
-        .welcome-name {
-            color: var(--red-accent);
-            text-shadow: 0 0 20px var(--red-accent);
+        /* --- Account Cards --- */
+        .section-title { font-size: 1.5rem; margin-bottom: 5px; }
+        .section-desc { color: var(--text-gray); font-size: 0.9rem; margin-bottom: 25px; }
+
+        .acc-type-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            position: relative;
+            transition: 0.2s;
+        }
+
+        .acc-type-card:hover { border-color: rgba(255, 77, 77, 0.3); }
+
+        .acc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .acc-title { font-weight: 700; font-size: 1.1rem; }
+        
+        .badge {
+            font-size: 0.7rem;
+            padding: 4px 8px;
+            border-radius: 5px;
+            font-weight: 800;
+            background: rgba(67, 181, 129, 0.1);
+            color: #43b581;
+        }
+
+        .btn-upgrade {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--upgrade-orange);
+            color: black;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 800;
+            box-shadow: 0 0 20px rgba(255, 153, 0, 0.4);
+            cursor: pointer;
+            border: none;
+        }
+
+        .locked { filter: blur(2px) grayscale(0.5); pointer-events: none; }
+
+        /* --- Placeholder Right Side --- */
+        .empty-icon {
+            font-size: 50px;
+            opacity: 0.1;
+            margin-bottom: 20px;
         }
 
         /* Error Overlay */
         #errorOverlay {
-            position: fixed; top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(9, 10, 15, 0.98);
-            z-index: 9999;
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(10px);
+            position: fixed; inset: 0; background: var(--bg-dark);
+            z-index: 9999; display: none; flex-direction: column;
+            justify-content: center; align-items: center;
         }
     </style>
 </head>
 <body>
 
-    <canvas id="starCanvas"></canvas>
-
     <div id="errorOverlay">
-        <h2 style="color:var(--red-accent);">Unauthorized Access</h2>
-        <p>Redirecting to login in <span id="countdown">5</span>s...</p>
+        <h2 style="color:var(--red-accent)">Access Denied</h2>
+        <p>Redirecting to login...</p>
     </div>
 
-    <div id="dashboardUI">
-        <nav>
-            <div class="logo">
+    <div id="dashboardUI" style="display:contents">
+        <aside class="sidebar">
+            <div class="sidebar-logo">
                 <span style="color:var(--red-accent)">Alt</span>Generator+
             </div>
-            
-            <div class="profile-wrapper">
-                <div id="pfpBtn" class="pfp-btn"></div>
-                
-                <div id="profilePanel" class="profile-panel">
-                    <div class="username-display" id="panelUsername">Loading...</div>
-                    <div class="divider"></div>
-                    <button class="logout-btn" onclick="logout()">Logout</button>
+
+            <div class="sidebar-section">
+                <div class="section-label">Dashboard</div>
+                <a class="nav-item active">⚡ Generate</a>
+                <a class="nav-item">🔒 Accounts</a>
+                <a class="nav-item">🔍 Scrape</a>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="section-label">Resources</div>
+                <a class="nav-item">👑 Upgrade</a>
+                <a class="nav-item">🎁 Rewards</a>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="user-card">
+                    <div id="userPfp" class="user-pfp"></div>
+                    <div class="user-info">
+                        <div id="userName" class="user-name">Loading...</div>
+                        <div class="user-status">Free Access</div>
+                    </div>
+                </div>
+                <div class="footer-btns">
+                    <button class="footer-btn">Settings</button>
+                    <button class="footer-btn" onclick="logout()" style="color:var(--red-accent)">Sign Out</button>
                 </div>
             </div>
-        </nav>
+        </aside>
 
-        <main class="main-content">
-            <h1>Welcome, <span class="welcome-name" id="displayUsername">User</span></h1>
-            <p style="opacity: 0.6;">Your premium dashboard is ready.</p>
+        <main class="main-container">
+            <div class="content-left">
+                <h1 class="section-title">Account Types</h1>
+                <p class="section-desc">Select an account to generate</p>
+
+                <div class="acc-type-card">
+                    <div class="acc-header">
+                        <div class="acc-title">Standard Alt</div>
+                        <span class="badge">✓ Pre-checked</span>
+                    </div>
+                    <p style="font-size: 0.8rem; color: var(--text-gray); margin: 0;">Generate basic Roblox alt account</p>
+                    <button class="footer-btn" style="width: 100%; margin-top: 15px; background: var(--red-accent);">Generate</button>
+                </div>
+
+                <div class="acc-type-card">
+                    <div class="locked">
+                        <div class="acc-header">
+                            <div class="acc-title">Alt (30+ day)</div>
+                        </div>
+                        <p style="font-size: 0.8rem; color: var(--text-gray); margin: 0;">Aged account for better bypass</p>
+                    </div>
+                    <button class="btn-upgrade">👑 Upgrade</button>
+                </div>
+
+                <div class="acc-type-card">
+                    <div class="locked">
+                        <div class="acc-header">
+                            <div class="acc-title">Age-Verified Alt</div>
+                        </div>
+                        <p style="font-size: 0.8rem; color: var(--text-gray); margin: 0;">Account with voice chat / 13+</p>
+                    </div>
+                    <button class="btn-upgrade">👑 Upgrade</button>
+                </div>
+            </div>
+
+            <div class="content-right">
+                <div class="empty-icon">👤</div>
+                <h2 style="margin:0">No Account Generated</h2>
+                <p style="color:var(--text-gray); max-width: 300px;">Select an account type and click generate to create a new account.</p>
+            </div>
         </main>
     </div>
 
@@ -200,7 +329,7 @@
             const userParam = urlParams.get('username');
             const pfpParam = urlParams.get('pfp');
 
-            // 1. Capture data from Backend redirect
+            // If we just came from Discord via Python, overwrite the old PFP and name
             if (userParam && pfpParam) {
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('userData', JSON.stringify({
@@ -210,35 +339,16 @@
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
 
-            // 2. Check session
             const isLoggedIn = localStorage.getItem('isLoggedIn');
             const userData = JSON.parse(localStorage.getItem('userData'));
 
             if (isLoggedIn === 'true' && userData) {
-                document.getElementById('dashboardUI').style.display = 'block';
-                document.getElementById('displayUsername').innerText = userData.username;
-                document.getElementById('panelUsername').innerText = userData.username;
-                
-                // Applying the real PFP
-                const pfpElement = document.getElementById('pfpBtn');
-                pfpElement.style.backgroundImage = `url('${userData.pfp}')`;
+                document.getElementById('userName').innerText = userData.username;
+                document.getElementById('userPfp').style.backgroundImage = `url('${userData.pfp}')`;
             } else {
-                handleRedirection();
+                document.getElementById('errorOverlay').style.display = 'flex';
+                setTimeout(() => window.location.href = 'index.html', 3000);
             }
-        }
-
-        function handleRedirection() {
-            const overlay = document.getElementById('errorOverlay');
-            overlay.style.display = 'flex';
-            let time = 5;
-            const timer = setInterval(() => {
-                time--;
-                document.getElementById('countdown').innerText = time;
-                if(time <= 0) {
-                    clearInterval(timer);
-                    window.location.href = 'index.html';
-                }
-            }, 1000);
         }
 
         function logout() {
@@ -246,36 +356,6 @@
             window.location.href = 'index.html';
         }
 
-        // UI Interactions
-        const pfpBtn = document.getElementById('pfpBtn');
-        const profilePanel = document.getElementById('profilePanel');
-
-        pfpBtn.onclick = (e) => {
-            e.stopPropagation();
-            profilePanel.classList.toggle('active');
-        };
-
-        window.onclick = () => profilePanel.classList.remove('active');
-
-        // Star Background
-        const canvas = document.getElementById('starCanvas');
-        const ctx = canvas.getContext('2d');
-        let stars = [];
-        function resize() {
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            stars = [];
-            for(let i=0; i<120; i++) stars.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, s:Math.random()*2});
-        }
-        function draw() {
-            ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle = "white";
-            stars.forEach(s => {
-                ctx.beginPath(); ctx.arc(s.x, s.y, s.s, 0, Math.PI*2); ctx.fill();
-                s.y -= 0.2; if(s.y < 0) s.y = canvas.height;
-            });
-            requestAnimationFrame(draw);
-        }
-        window.onresize = resize;
-        resize(); draw();
         initAuth();
     </script>
 </body>
