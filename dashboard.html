@@ -1,1 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | AltGenerator+</title>
+    <style>
+        :root {
+            --discord-color: #5865F2;
+            --red-accent: #ff4d4d;
+            --bg-dark: #090A0F;
+            --panel-bg: rgba(255, 255, 255, 0.05);
+        }
 
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg-dark);
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        #starCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            background: radial-gradient(circle at center, #1B2735 0%, #090A0F 100%);
+        }
+
+        /* --- Navbar & Profile --- */
+        nav {
+            width: 100%;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 100;
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+        }
+
+        .profile-container {
+            position: relative;
+        }
+
+        .pfp-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--red-accent);
+            cursor: pointer;
+            transition: transform 0.2s;
+            background-size: cover;
+            background-position: center;
+            box-shadow: 0 0 15px var(--red-accent);
+        }
+
+        .pfp-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* --- Dropdown Panel --- */
+        .profile-panel {
+            position: absolute;
+            top: 65px;
+            right: 0;
+            width: 200px;
+            background: rgba(20, 22, 31, 0.95);
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 15px;
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .profile-panel.active {
+            display: flex;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        .username-display {
+            font-weight: 600;
+            color: #ddd;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .divider {
+            height: 1px;
+            background: rgba(255,255,255,0.1);
+            margin: 5px 0;
+        }
+
+        .logout-btn {
+            background: var(--red-accent);
+            color: white;
+            border: none;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: #cc0000;
+        }
+
+        /* --- Main Content --- */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 80vh;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            margin-bottom: 10px;
+        }
+
+        .welcome-name {
+            color: var(--red-accent);
+            text-shadow: 0 0 20px var(--red-accent);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="starCanvas"></canvas>
+
+    <nav>
+        <div class="logo">
+            <span style="color:var(--red-accent)">Alt</span>Generator+
+        </div>
+        
+        <div class="profile-container">
+            <div id="pfpBtn" class="pfp-btn" style="background-image: url('https://cdn.discordapp.com/embed/avatars/0.png');"></div>
+            
+            <div id="profilePanel" class="profile-panel">
+                <div class="username-display" id="panelUsername">Username#0000</div>
+                <div class="divider"></div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <h1>Welcome, <span class="welcome-name" id="displayUsername">Guest</span></h1>
+        <p style="opacity: 0.6;">Select a tool from the sidebar to get started.</p>
+    </main>
+
+    <script>
+        // --- AUTH REDIRECT LOGIC ---
+        // In a real Discord setup, you'd save these in localStorage after login
+        const userLoggedIn = localStorage.getItem('isLoggedIn');
+        const discordUser = JSON.parse(localStorage.getItem('userData'));
+
+        if (!userLoggedIn) {
+            // Redirect to index if not logged in
+            window.location.href = 'index.html'; 
+        } else {
+            // Populate UI with real data
+            document.getElementById('displayUsername').innerText = discordUser.username;
+            document.getElementById('panelUsername').innerText = discordUser.username;
+            document.getElementById('pfpBtn').style.backgroundImage = `url(${discordUser.pfp})`;
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'index.html';
+        }
+
+        // --- UI LOGIC ---
+        const pfpBtn = document.getElementById('pfpBtn');
+        const profilePanel = document.getElementById('profilePanel');
+
+        pfpBtn.addEventListener('click', () => {
+            profilePanel.classList.toggle('active');
+        });
+
+        // Close panel if clicking outside
+        window.addEventListener('click', (e) => {
+            if (!pfpBtn.contains(e.target) && !profilePanel.contains(e.target)) {
+                profilePanel.classList.remove('active');
+            }
+        });
+
+        // --- STAR BACKGROUND (Same as index) ---
+        const canvas = document.getElementById('starCanvas');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+
+        function initStars() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            stars = [];
+            for (let i = 0; i < 150; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2,
+                    speed: Math.random() * 0.5 + 0.1
+                });
+            }
+        }
+
+        function drawStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "white";
+            stars.forEach(star => {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fill();
+                star.y -= star.speed;
+                if (star.y < 0) star.y = canvas.height;
+            });
+            requestAnimationFrame(drawStars);
+        }
+
+        window.addEventListener('resize', initStars);
+        initStars();
+        drawStars();
+    </script>
+</body>
+</html>
