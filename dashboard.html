@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | AltGenerator+</title>
+    <title>Debug | AltGenerator+</title>
     <style>
         :root {
             --discord-color: #5865F2;
@@ -30,7 +30,7 @@
             background: radial-gradient(circle at center, #1B2735 0%, #090A0F 100%);
         }
 
-        /* --- Error Overlay --- */
+        /* --- Debug/Error Overlay --- */
         #errorOverlay {
             position: fixed;
             top: 0;
@@ -52,6 +52,7 @@
             border-radius: 20px;
             border: 1px solid rgba(255, 77, 77, 0.2);
             background: rgba(255, 255, 255, 0.03);
+            max-width: 450px;
         }
 
         /* --- Dashboard UI --- */
@@ -96,15 +97,19 @@
 
         .profile-panel.active { display: flex; }
 
-        .logout-btn {
-            background: var(--red-accent);
-            color: white;
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
             border: none;
-            padding: 8px;
-            border-radius: 6px;
-            cursor: pointer;
             font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 5px;
         }
+
+        .btn-red { background: var(--red-accent); color: white; }
+        .btn-blue { background: var(--discord-color); color: white; }
 
         .main-content {
             display: flex;
@@ -123,9 +128,13 @@
 
     <div id="errorOverlay">
         <div class="error-box">
-            <h2 style="color:var(--red-accent);">Error when logging in!</h2>
-            <p>Redirecting to login in <span id="countdown">5</span> seconds...</p>
-            <p><a href="index.html" style="color:var(--discord-color); font-weight:bold; text-decoration:none;">Click here</a> if not redirected.</p>
+            <h2 style="color:var(--red-accent);">Debug: Not Logged In</h2>
+            <p id="debugStatus">Checking URL parameters...</p>
+            <p style="font-size: 0.9rem; opacity: 0.7;">I have disabled the auto-redirect so you can check the F12 console.</p>
+            <div style="margin-top: 20px;">
+                <a href="index.html" class="btn btn-blue">Go Back Home</a>
+                <button class="btn btn-red" onclick="document.getElementById('errorOverlay').style.display='none'">Dismiss & Peek at UI</button>
+            </div>
         </div>
     </div>
 
@@ -137,67 +146,59 @@
                 <div id="profilePanel" class="profile-panel">
                     <div id="panelUsername" style="text-align:center;">User#0000</div>
                     <hr style="opacity:0.1; width:100%;">
-                    <button class="logout-btn" onclick="logout()">Logout</button>
+                    <button class="btn btn-red" style="width:100%" onclick="logout()">Logout</button>
                 </div>
             </div>
         </nav>
         <div class="main-content">
             <h1>Welcome, <span id="displayUsername" class="welcome-name">User</span></h1>
-            <p style="opacity:0.5;">Authentication Successful.</p>
+            <p style="opacity:0.5;">If you see your name, the login worked!</p>
         </div>
     </div>
 
     <script>
-        // --- THE "BRIDGE" LOGIC ---
-        // This runs the moment the page loads
         function initAuth() {
+            console.log("--- Starting Auth Debug ---");
             const urlParams = new URLSearchParams(window.location.search);
-            const hasDiscordCode = urlParams.has('code');
+            const debugStatus = document.getElementById('debugStatus');
+            
+            const code = urlParams.get('code');
+            console.log("URL Code found:", code);
 
-            // 1. If we have a code in the URL, FORCE login state
-            if (hasDiscordCode) {
-                console.log("Discord code detected! Logging in...");
+            if (code) {
+                console.log("SUCCESS: Found Discord code. Setting local storage...");
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('userData', JSON.stringify({
-                    username: "Member", 
-                    pfp: "https://cdn.discordapp.com/embed/avatars/0.png"
+                    username: "Discord Member", 
+                    pfp: "https://cdn.discordapp.com/embed/avatars/2.png"
                 }));
-                // Clean the URL so the code doesn't stay there
+                // Remove the code from the URL for cleanliness
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
 
-            // 2. Now check if we are logged in
             const isLoggedIn = localStorage.getItem('isLoggedIn');
-            const userData = JSON.parse(localStorage.getItem('userData'));
+            console.log("Local Storage 'isLoggedIn':", isLoggedIn);
 
-            if (isLoggedIn === 'true' && userData) {
+            if (isLoggedIn === 'true') {
+                const userData = JSON.parse(localStorage.getItem('userData'));
+                console.log("User Data loaded:", userData);
+                
                 document.getElementById('dashboardUI').style.display = 'block';
+                document.getElementById('errorOverlay').style.display = 'none';
+                
                 document.getElementById('displayUsername').innerText = userData.username;
                 document.getElementById('panelUsername').innerText = userData.username;
                 document.getElementById('pfpBtn').style.backgroundImage = `url(${userData.pfp})`;
             } else {
-                startRedirect();
+                console.log("FAILURE: No login state found.");
+                document.getElementById('errorOverlay').style.display = 'flex';
+                debugStatus.innerText = "No 'code' found in URL and no session in LocalStorage.";
             }
-        }
-
-        function startRedirect() {
-            const overlay = document.getElementById('errorOverlay');
-            const countdownEl = document.getElementById('countdown');
-            overlay.style.display = 'flex';
-            let time = 5;
-            const timer = setInterval(() => {
-                time--;
-                countdownEl.innerText = time;
-                if (time <= 0) {
-                    clearInterval(timer);
-                    window.location.href = 'index.html';
-                }
-            }, 1000);
         }
 
         function logout() {
             localStorage.clear();
-            window.location.href = 'index.html';
+            location.reload();
         }
 
         // PFP Toggle
@@ -207,7 +208,6 @@
             e.stopPropagation();
             profilePanel.classList.toggle('active');
         };
-        window.onclick = () => profilePanel.classList.remove('active');
 
         // Star Background
         const canvas = document.getElementById('starCanvas');
@@ -217,21 +217,21 @@
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
             stars = [];
-            for(let i=0; i<100; i++) stars.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, s:Math.random()*2});
+            for(let i=0; i<80; i++) stars.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, s:Math.random()*2});
         }
         function draw() {
             ctx.clearRect(0,0,canvas.width,canvas.height);
             ctx.fillStyle = "white";
             stars.forEach(s => {
                 ctx.beginPath(); ctx.arc(s.x, s.y, s.s, 0, Math.PI*2); ctx.fill();
-                s.y -= 0.2; if(s.y < 0) s.y = canvas.height;
+                s.y -= 0.15; if(s.y < 0) s.y = canvas.height;
             });
             requestAnimationFrame(draw);
         }
         window.onresize = resize;
         resize(); draw();
 
-        // RUN AUTH
+        // EXECUTE
         initAuth();
     </script>
 </body>
